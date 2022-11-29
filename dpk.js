@@ -1,28 +1,35 @@
-const crypto = require("crypto");
+const {
+  TRIVIAL_PARTITION_KEY,
+  MAX_PARTITION_KEY_LENGTH,
+} = require("./constant");
 
-exports.deterministicPartitionKey = (event) => {
-  const TRIVIAL_PARTITION_KEY = "0";
-  const MAX_PARTITION_KEY_LENGTH = 256;
-  let candidate;
+const { getHexDigest } = require("./utils");
 
+const getEventCandidateHexDigest = (event) => {
   if (event) {
     if (event.partitionKey) {
-      candidate = event.partitionKey;
-    } else {
-      const data = JSON.stringify(event);
-      candidate = crypto.createHash("sha3-512").update(data).digest("hex");
+      return event.partitionKey;
     }
+    const data = JSON.stringify(event);
+    return getHexDigest(data);
   }
+};
 
-  if (candidate) {
-    if (typeof candidate !== "string") {
-      candidate = JSON.stringify(candidate);
-    }
-  } else {
-    candidate = TRIVIAL_PARTITION_KEY;
+const parseEventCandidate = (candidate) => {
+  if (candidate && typeof candidate !== "string") {
+    return JSON.stringify(candidate);
   }
+  if (candidate) return candidate;
+  return TRIVIAL_PARTITION_KEY;
+};
+
+const deterministicPartitionKey = (event) => {
+  let candidate = getEventCandidateHexDigest(event);
+  candidate = parseEventCandidate(candidate);
   if (candidate.length > MAX_PARTITION_KEY_LENGTH) {
-    candidate = crypto.createHash("sha3-512").update(candidate).digest("hex");
+    candidate = getHexDigest(candidate);
   }
   return candidate;
 };
+
+module.exports = { getEventCandidateHexDigest, parseEventCandidate,deterministicPartitionKey };

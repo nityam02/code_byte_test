@@ -10,5 +10,12 @@ You will be graded on the exhaustiveness and quality of your unit tests, the dep
 
 ## Your Explanation Here
 
+> Single responsiblity pattern is being followed which include dividing the function into modular methods with individual 
+responsiblity 
+> Utlis file include: `getHexDigest` ->  returns hashed key
+> Constant file include all the constants being used.
+> DPK file has been  broken  down  into three modular methods  -> `getEventCandidateHexDigest`,`parseEventCandidate`,`deterministicPartitionKey`
+> Test file include both positive  and negative scenarios.
+
 
 
